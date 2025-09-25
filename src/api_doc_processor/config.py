@@ -91,11 +91,27 @@ API Documentation:
     )   
 
 
+class WorkflowNodeConfig(BaseModel):
+    """Configuration for individual workflow nodes."""
+    enabled: bool = Field(default=True, description="Whether this node is enabled")
+    retry_count: int = Field(default=1, description="Number of retries for this node")
+    timeout: float = Field(default=300.0, description="Timeout in seconds")
+
+
+class WorkflowConfig(BaseModel):
+    """Configuration for workflow behavior."""
+    url_collection: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
+    crawling: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
+    llm_processing: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
+    output_management: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
+
+
 class Config(BaseModel):
     """Main configuration model."""
     firecrawl: FirecrawlConfig
     litellm: LiteLLMConfig
     prompt: PromptConfig = Field(default_factory=PromptConfig)
+    workflow: WorkflowConfig = Field(default_factory=WorkflowConfig)
 
 
 def load_config(config_path: Optional[Path] = None) -> Config:
