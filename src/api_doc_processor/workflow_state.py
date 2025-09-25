@@ -26,6 +26,7 @@ class WorkflowMetadata(TypedDict):
     failed_crawls: NotRequired[int]
     spec_generated: NotRequired[bool]
     estimated_tokens: NotRequired[Dict[str, int]]
+    mock_server_generated: NotRequired[bool]
 
 
 class WorkflowState(TypedDict):
@@ -43,6 +44,11 @@ class WorkflowState(TypedDict):
     markdown_files: List[Path]
     tech_spec: NotRequired[str]
     spec_filepath: NotRequired[Path]
+    
+    # Mock server results
+    mock_server_dir: NotRequired[Path]
+    mock_server_process: NotRequired[Any]
+    mock_server_data: NotRequired[Dict[str, Any]]
     
     # Error tracking
     errors: List[str]
@@ -69,4 +75,5 @@ class WorkflowConfig(TypedDict):
     url_collection: NotRequired[NodeConfig]
     crawling: NotRequired[NodeConfig] 
     llm_processing: NotRequired[NodeConfig]
+    mock_server_generation: NotRequired[NodeConfig]
     output_management: NotRequired[NodeConfig]

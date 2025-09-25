@@ -57,7 +57,12 @@ def print_header():
     is_flag=True,
     help="Enable verbose output"
 )
-def main(config_path: Path, create_config: bool, output_dir: Path, test_only: bool, verbose: bool):
+@click.option(
+    "--generate-mock-server",
+    is_flag=True,
+    help="Generate a mock server after creating the tech spec"
+)
+def main(config_path: Path, create_config: bool, output_dir: Path, test_only: bool, verbose: bool, generate_mock_server: bool):
     """API Documentation Processor - Automate API integration research."""
     
     if create_config:
@@ -113,6 +118,11 @@ def main(config_path: Path, create_config: bool, output_dir: Path, test_only: bo
         
         console.print("\n[green]✓[/green] All API connections successful!")
         return
+    
+    # Enable mock server generation if requested
+    if generate_mock_server:
+        config.workflow.mock_server_generation.enabled = True
+        console.print(f"[green]✓[/green] Mock server generation enabled")
     
     # Create and run the workflow
     try:

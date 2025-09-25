@@ -103,6 +103,7 @@ class WorkflowConfig(BaseModel):
     url_collection: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
     crawling: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
     llm_processing: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
+    mock_server_generation: WorkflowNodeConfig = Field(default_factory=lambda: WorkflowNodeConfig(enabled=False))
     output_management: WorkflowNodeConfig = Field(default_factory=WorkflowNodeConfig)
 
 
