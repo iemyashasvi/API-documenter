@@ -11,12 +11,20 @@ A command-line tool that automates the research and planning phase of API integr
 - Organized output management
 
 ## Installation
+```bash
+pip install -e .  
+```
 
+or 
 ```bash
 pip install api-doc-processor
 ```
 
 ## Usage
+```bash 
+api-doc-processor --create-config
+```
+add your keys and then use 
 
 ```bash
 api-doc-processor
