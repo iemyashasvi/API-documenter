@@ -42,6 +42,13 @@ def output_node(state: WorkflowState) -> WorkflowState:
     if "tech_spec" in state:
         console.print(f"• Generated {len(state['tech_spec'])} character specification")
     
+    if state["metadata"].get("mock_server_generated", False):
+        console.print(f"• Mock server generated successfully")
+        if "mock_server_dir" in state:
+            console.print(f"• Mock server directory: {state['mock_server_dir']}")
+        if "mock_server_process" in state and state["mock_server_process"]:
+            console.print(f"• Mock server running (PID: {state['mock_server_process'].pid})")
+    
     console.print(f"• Results saved to: {state['output_dir']}")
     
     # Display any warnings

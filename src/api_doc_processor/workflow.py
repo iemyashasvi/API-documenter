@@ -1,5 +1,6 @@
 """LangGraph workflow for API Documentation Processor."""
 
+import asyncio
 import time
 from pathlib import Path
 from typing import Literal
@@ -13,6 +14,7 @@ from .nodes import (
     url_collection_node,
     crawling_node,
     llm_processing_node,
+    mock_server_node,
     output_node
 )
 
@@ -35,9 +37,20 @@ def should_continue_after_crawling(state: WorkflowState) -> Literal["llm_process
     return "llm_processing"
 
 
-def should_continue_after_llm(state: WorkflowState) -> Literal["output", "end"]:
+def should_continue_after_llm(state: WorkflowState) -> Literal["mock_server", "output", "end"]:
     """Decide whether to continue after LLM processing."""
-    # Always continue to output to show results and errors
+    # Check if mock server generation is enabled and we have a spec
+    if ("tech_spec" in state and state["tech_spec"] and 
+        hasattr(state["config"], "workflow") and 
+        hasattr(state["config"].workflow, "mock_server_generation") and
+        state["config"].workflow.mock_server_generation.enabled):
+        return "mock_server"
+    return "output"
+
+
+def should_continue_after_mock_server(state: WorkflowState) -> Literal["output", "end"]:
+    """Decide whether to continue after mock server generation."""
+    # Always continue to output to show results
     return "output"
 
 
@@ -59,6 +72,7 @@ class APIDocumentationWorkflow:
         workflow.add_node("url_collection", url_collection_node)
         workflow.add_node("crawling", crawling_node)
         workflow.add_node("llm_processing", llm_processing_node)
+        workflow.add_node("mock_server", lambda state: asyncio.run(mock_server_node(state)))
         workflow.add_node("output", output_node)
         workflow.add_node("end", lambda state: state)  # Terminal node
         
@@ -87,6 +101,16 @@ class APIDocumentationWorkflow:
         workflow.add_conditional_edges(
             "llm_processing",
             should_continue_after_llm,
+            {
+                "mock_server": "mock_server",
+                "output": "output",
+                "end": "end"
+            }
+        )
+        
+        workflow.add_conditional_edges(
+            "mock_server",
+            should_continue_after_mock_server,
             {
                 "output": "output",
                 "end": "end"
@@ -121,7 +145,8 @@ class APIDocumentationWorkflow:
                 total_urls=0,
                 successful_crawls=0,
                 failed_crawls=0,
-                spec_generated=False
+                spec_generated=False,
+                mock_server_generated=False
             )
         )
     
@@ -156,6 +181,7 @@ class APIDocumentationWorkflow:
             "url_collection": url_collection_node,
             "crawling": crawling_node,
             "llm_processing": llm_processing_node,
+            "mock_server": lambda state: asyncio.run(mock_server_node(state)),
             "output": output_node
         }
         
