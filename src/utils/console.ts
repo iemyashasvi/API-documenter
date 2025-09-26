@@ -13,6 +13,15 @@ export class Console {
 
   private parseRichMarkup(text: string): string {
     return text
+      // Combined styles (order matters - do combined first)
+      .replace(/\[bold blue\](.*?)\[\/bold blue\]/g, chalk.bold.blue('$1'))
+      .replace(/\[bold red\](.*?)\[\/bold red\]/g, chalk.bold.red('$1'))
+      .replace(/\[bold green\](.*?)\[\/bold green\]/g, chalk.bold.green('$1'))
+      .replace(/\[bold yellow\](.*?)\[\/bold yellow\]/g, chalk.bold.yellow('$1'))
+      .replace(/\[bold cyan\](.*?)\[\/bold cyan\]/g, chalk.bold.cyan('$1'))
+      .replace(/\[bold magenta\](.*?)\[\/bold magenta\]/g, chalk.bold.magenta('$1'))
+      
+      // Single styles
       .replace(/\[bold\](.*?)\[\/bold\]/g, chalk.bold('$1'))
       .replace(/\[red\](.*?)\[\/red\]/g, chalk.red('$1'))
       .replace(/\[green\](.*?)\[\/green\]/g, chalk.green('$1'))
